@@ -1,0 +1,11 @@
+--- a/scotch_5.1.12_esmumps/src/esmumps/Makefile	2010-07-02 23:31:06.000000000 +0200
++++ b/scotch_5.1.12_esmumps/src/esmumps/Makefile	2014-04-17 11:13:01.000000000 +0200
+@@ -44,7 +44,7 @@ include ../Makefile.inc
+ 				$(CC) $(CFLAGS) $(CLIBFLAGS) -I$(includedir) -c $(<) -o $(@)
+ 
+ %$(EXE)	:	%.c
+-		 		$(CC) $(CFLAGS) -I$(includedir) $(<) -o $(@) -L$(libdir) $(LDFLAGS) -L. -l$(ESMUMPSLIB) -l$(SCOTCHLIB) -l$(SCOTCHLIB)errexit
++		 		$(CC) $(CFLAGS) -I$(includedir) $(<) -o $(@) -L$(libdir) $(LDFLAGS) -L. -l$(ESMUMPSLIB) -l$(SCOTCHLIB) -l$(SCOTCHLIB)errexit -lm
+ 
+ ##
+ ##  Project rules.

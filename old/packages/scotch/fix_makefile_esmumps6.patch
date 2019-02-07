@@ -1,0 +1,12 @@
+diff -NaruB a/scotch_6.0.3/src/esmumps/Makefile b/scotch_6.0.3/src/esmumps/Makefile
+--- a/scotch_6.0.3/src/esmumps/Makefile	2016-08-14 18:05:58.000000000 +0200
++++ b/scotch_6.0.3/src/esmumps/Makefile	2016-08-14 18:06:38.000000000 +0200
+@@ -44,7 +44,7 @@
+ 				$(CC) $(CFLAGS) $(CLIBFLAGS) -I$(includedir) -c $(<) -o $(@)
+ 
+ %$(EXE)	:	%.c
+-		 		$(CC) $(CFLAGS) -I$(includedir) $(<) -o $(@) -L$(libdir) $(LDFLAGS) -L. -l$(ESMUMPSLIB) -l$(SCOTCHLIB) -lscotch -l$(SCOTCHLIB)errexit -lm
++		 		$(CC) $(CFLAGS) -I$(includedir) $(<) -o $(@) -L$(libdir) -L. -l$(ESMUMPSLIB) -l$(SCOTCHLIB) -lscotch -l$(SCOTCHLIB)errexit $(LDFLAGS) -lm
+ 
+ ##
+ ##  Project rules.

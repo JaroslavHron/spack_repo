@@ -1,0 +1,12 @@
+diff -Naur SuiteSparse-orig/Mongoose/CMakeLists.txt SuiteSparse/Mongoose/CMakeLists.txt
+--- SuiteSparse-orig/Mongoose/CMakeLists.txt	2018-07-05 21:06:44.000000000 +0200
++++ SuiteSparse/Mongoose/CMakeLists.txt	2018-09-11 14:17:34.496922867 +0200
+@@ -169,7 +169,7 @@
+         PATHS ${SUITESPARSE_CONFIG_LIBRARY_DIRS}
+         )
+ 
+-if (EXISTS ${SUITESPARSE_CONFIG_INCLUDE_DIR} AND EXISTS ${SUITESPARSE_CONFIG_LIBRARY})
++if (FALSE AND EXISTS ${SUITESPARSE_CONFIG_INCLUDE_DIR} AND EXISTS ${SUITESPARSE_CONFIG_LIBRARY})
+     message(STATUS "Installed SuiteSparse_config" ${BoldGreen} " found" ${ColourReset} " in " ${SUITESPARSE_CONFIG_INCLUDE_DIR} " and " ${SUITESPARSE_CONFIG_LIBRARY})
+     include_directories(${SUITESPARSE_CONFIG_INCLUDE_DIR})
+ elseif (EXISTS ${PROJECT_SOURCE_DIR}/../SuiteSparse_config)
