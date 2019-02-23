@@ -42,19 +42,6 @@ def _mxm_dir():
     else:
         return None
 
-def _slurm_dir():
-    try:
-        # Try to locate slurm by looking for a utility in the path
-        sinfo = which("sinfo")
-        # Run it (silently) to ensure it works
-        sinfo(output=str, error=str)
-        # Get path to executable
-        path = sinfo.exe[0]
-        # Remove executable name and "bin" directory
-        return ancestor(path, n=2)
-    except:
-        return None
-
 
 class Openmpi(AutotoolsPackage):
     """An open source Message Passing Interface implementation.
@@ -215,6 +202,7 @@ class Openmpi(AutotoolsPackage):
             description='Enable MPI_THREAD_MULTIPLE support')
     variant('cuda', default=False, description='Enable CUDA support')
     variant('pmi', default=False, description='Enable PMI support')
+    variant('xpmem', default=False, description='Enable XPmem support')
     variant('cxx_exceptions', default=True, description='Enable C++ Exception support')
     # Adding support to build a debug version of OpenMPI that activates
     # Memchecker, as described here:
@@ -263,11 +251,7 @@ class Openmpi(AutotoolsPackage):
     depends_on('ucx', when='fabrics=ucx')
     depends_on('libfabric', when='fabrics=libfabric')
     depends_on('slurm', when='schedulers=slurm')
-    depends_on('slurm', when='fabrics=pmi')
     depends_on('binutils+libiberty', when='fabrics=mxm')
-
-    depends_on('pmix', when='fabrics=pmix')
-    depends_on('libevent', when='fabrics=pmix')
 
     conflicts('+cuda', when='@:1.6')  # CUDA support was added in 1.7
     conflicts('fabrics=psm2', when='@:1.8')  # PSM2 support was added in 1.10.0
@@ -354,30 +338,6 @@ class Openmpi(AutotoolsPackage):
             line += '={0}'.format(path)
         return line
 
-    def with_or_without_slurm(self, activated):
-        opt = 'slurm'
-        # If the option has not been activated return --without-slurm
-        if not activated:
-            return '--without-{0}'.format(opt)
-        line = '--with-{0}={1}'.format(opt,self.spec['slurm'].prefix)
-        return line
-
-    def with_or_without_pmi(self, activated):
-        opt = 'pmi'
-        # If the option has not been activated return --without-pmi
-        if not activated:
-            return '--without-{0}'.format(opt)
-        line = '--with-{0}={1}'.format(opt,self.spec['slurm'].prefix)
-        return line
-
-    def with_or_without_pmix(self, activated):
-        opt = 'pmix'
-        # If the option has not been activated return --without-pmi
-        if not activated:
-            return '' #'--without-{0}'.format(opt)
-        line = '--with-{0}={1}'.format(opt,self.spec['pmix'].prefix)
-        return line
-
     @run_before('autoreconf')
     def die_without_fortran(self):
         # Until we can pass variants such as +fortran through virtual
@@ -396,7 +356,7 @@ class Openmpi(AutotoolsPackage):
     def configure_args(self):
         spec = self.spec
         config_args = [
-            '--enable-shared',
+            '--enable-shared'
         ]
 
         # Add extra_rpaths dirs from compilers.yaml into link wrapper
@@ -414,6 +374,7 @@ class Openmpi(AutotoolsPackage):
         # for versions older than 3.0.3,3.1.3,4.0.0
         # Presumably future versions after 11/2018 should support slurm+static
         if spec.satisfies('schedulers=slurm'):
+            config_args.append('--enable-dlopen')
             config_args.append('--with-pmi={0}'.format(spec['slurm'].prefix))
             if spec.satisfies('@3.1.3:') or spec.satisfies('@3.0.3'):
                 config_args.append('--enable-static')
@@ -477,6 +438,12 @@ class Openmpi(AutotoolsPackage):
             else:
                 config_args.append('--disable-mpi-thread-multiple')
 
+        # XPMEM support
+        if '+xpmem' in spec:
+            config_args.append('--with-xpmem')
+        else:
+            config_args.append('--without-xpmem')
+
         # CUDA support
         # See https://www.open-mpi.org/faq/?category=buildcuda
         if spec.satisfies('@1.7:'):
@@ -508,12 +475,6 @@ class Openmpi(AutotoolsPackage):
             config_args.append('--enable-cxx-exceptions')
         else:
             config_args.append('--disable-cxx-exceptions')
-
-        if '+xpmem' in spec:
-            config_args.append('--with-xpmem')
-        else:
-            config_args.append('--without-xpmem')
-
         return config_args
 
     @run_after('install')

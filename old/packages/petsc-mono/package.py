@@ -2,21 +2,29 @@ import os
 import sys
 from spack import *
 
-class PetscMonolithic(Package):
+class Petsc(Package):
     """PETSc is a suite of data structures and routines for the scalable
     (parallel) solution of scientific applications modeled by partial
     differential equations.
     """
 
     homepage = "http://www.mcs.anl.gov/petsc/index.html"
-    url = "http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.5.3.tar.gz"
+    url      = "http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.5.3.tar.gz"
+    git      = "https://bitbucket.org/petsc/petsc.git"
 
-    maintainers = ['balay', 'barrysmith']
+    maintainers = ['balay', 'barrysmith', 'jedbrown']
 
-    version('develop', git='https://bitbucket.org/petsc/petsc.git', tag='master')
-    version('xsdk-0.2.0', git='https://bitbucket.org/petsc/petsc.git', tag='xsdk-0.2.0')
+    version('develop', branch='master')
+    version('xsdk-0.2.0', tag='xsdk-0.2.0')
 
-    version('3.9.2', '8bedc0cd8c8603d54bfd99a6e8f77b3d')    
+    version('3.10.3', 'cd106babbae091604fee40c258737c84dec048949be779eaef5a745df3dc8de4')
+    version('3.10.2', '63ed950653ae9b8d19daea47e24c0338')
+    version('3.10.1', '2d0d5a9bd8112a4147a2a23f7f62a906')
+    version('3.10.0', '0240c2ce8c54e47b3531a743ee844d41')
+    version('3.9.4', 'c98eb67573efb2f91c6f239368259e44')
+    version('3.9.3', '7b71d705f66f9961cb0e2da3f9da79a1')
+    version('3.9.2', '8bedc0cd8c8603d54bfd99a6e8f77b3d')
+    version('3.9.1', 'd3a229a188dbeef9b3f29b9a63622fad')
     version('3.9.0', '34b8a81814ca050a96d58e53a2f0ac7a')
     version('3.8.4', 'd7767fe2919536aa393eb22841899306')
     version('3.8.3', '322cbcf2a0f7b7bad562643b05d66f11')
@@ -38,7 +46,8 @@ class PetscMonolithic(Package):
     variant('download',  default=True,  description='Download all packages')
     variant('shared',  default=True,  description='Enables the build of shared libraries')
     variant('mpi',     default=True,  description='Activates MPI support')
-    variant('double',  default=True,  description='Switches between single and double precision')
+    variant('double',  default=True,
+            description='Switches between single and double precision')
     variant('complex', default=False, description='Build with complex numbers')
     variant('debug',   default=False, description='Compile in debug mode')
     variant('int64', default=False, description='Compile with 64bit indices')
@@ -74,7 +83,7 @@ class PetscMonolithic(Package):
     depends_on('metis@5:~int64+real64', when='+metis~int64+double')
     depends_on('metis@5:+int64', when='+metis+int64~double')
 
-    depends_on('hdf5+mpi+hl', when='+hdf5+mpi')
+    depends_on('hdf5+mpi+hl+fortran', when='+hdf5+mpi')
     depends_on('zlib', when='+hdf5')
     depends_on('parmetis', when='+metis+mpi')
             
@@ -101,24 +110,25 @@ class PetscMonolithic(Package):
                 errors = ['incompatible variants given'] + errors
                 raise RuntimeError('\n'.join(errors))
         else:
-            opt_flags='-O2 -mfpmath=sse -fexpensive-optimizations'
             compiler_opts = [
-                '--with-mpi=1',
-                '--with-mpi-dir=%s' % self.spec['mpi'].prefix,
-#                '--with-cc=%s' % self.spec['mpi'].mpicc,
-#                '--with-cxx=%s' % self.spec['mpi'].mpicxx,
-#                '--with-fc=%s' % self.spec['mpi'].mpifc,
-                '--CFLAGS=-march=native -pipe',
-                '--CXXFLAGS=-march=native -pipe',
-                '--FFLAGS=-march=native -pipe',
-                '--COPTFLAGS=%s' % opt_flags,
-                '--CXXOPTFLAGS=%s' % opt_flags,
-                '--FOPTFLAGS=%s' % opt_flags
+                '--with-cc=%s' % self.spec['mpi'].mpicc,
+                '--with-cxx=%s' % self.spec['mpi'].mpicxx,
+                '--with-fc=%s' % self.spec['mpi'].mpifc
             ]
         return compiler_opts
 
     def install(self, spec, prefix):
-        options = ['--with-ssl=0','--with-x=0','--with-pic=1','--with-single-library=1','--with-clanguage=c','--with-c++-support']
+        options = ['--with-ssl=0',
+                   '--with-pic=1',
+                   '--with-single-library=1',
+                   '--with-clanguage=c',
+                   '--with-c++-support'
+                   '--download-c2html=0',
+                   '--download-sowing=0',
+                   '--download-hwloc=0',
+                   'CFLAGS=%s' % ' '.join(spec.compiler_flags['cflags']),
+                   'FFLAGS=%s' % ' '.join(spec.compiler_flags['fflags']),
+                   'CXXFLAGS=%s' % ' '.join(spec.compiler_flags['cxxflags'])]
         options.extend(self.mpi_dependent_options())
         options.extend([
             '--with-precision=%s' % (
@@ -129,12 +139,22 @@ class PetscMonolithic(Package):
             '--with-debugging=%s' % ('1' if '+debug' in spec else '0'),
             '--with-64-bit-indices=%s' % ('1' if '+int64' in spec else '0')
         ])
+        if '+debug' not in spec:
+            options.extend(['COPTFLAGS=',
+                            'FOPTFLAGS=',
+                            'CXXOPTFLAGS='])
+
         # Make sure we use exactly the same Blas/Lapack libraries
         # across the DAG. To that end list them explicitly
         lapack_blas = spec['lapack'].libs + spec['blas'].libs
         options.extend([
             '--with-blas-lapack-lib=%s' % lapack_blas.joined()
         ])
+
+        if '+X' in spec:
+            options.append('--with-x=1')
+        else:
+            options.append('--with-x=0')
 
         if 'trilinos' in spec:
             options.append('--with-cxx-dialect=C++11')
@@ -213,14 +233,22 @@ class PetscMonolithic(Package):
         # configure fails if these env vars are set outside of Spack
         spack_env.unset('PETSC_DIR')
         spack_env.unset('PETSC_ARCH')
+
         spack_env.unset('PYTHONPATH')
         spack_env.unset('PYTHONHOME')
-
+                
         # Set PETSC_DIR in the module file
         run_env.set('PETSC_DIR', self.prefix)
-        #run_env.unset('PETSC_ARCH')
+        run_env.unset('PETSC_ARCH')
 
     def setup_dependent_environment(self, spack_env, run_env, dependent_spec):
         # Set up PETSC_DIR for everyone using PETSc package
         spack_env.set('PETSC_DIR', self.prefix)
-        #spack_env.unset('PETSC_ARCH')
+        spack_env.unset('PETSC_ARCH')
+
+    @property
+    def headers(self):
+        return find_headers('petsc', self.prefix.include, recursive=False) \
+            or None  # return None to indicate failure
+
+    # For the 'libs' property - use the default handler.

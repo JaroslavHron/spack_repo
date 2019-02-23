@@ -17,9 +17,13 @@ class BinGmsh(Package):
     def url_for_version(self, version):
         return 'http://gmsh.info/bin/Linux/gmsh-{0}-Linux64.tgz'.format(version)
     
-    version('3.0.6', '096e85eaf2cb70346ea2deaaab08edc9')
-    version('2.13.1', '9ddd236b74669af88035addb3b7cb007')
+    version('4.1.5', sha256='449f7e3bf0bf4680221ff1aeb839a24a8f8f47bf1025e32e2ca5e28968376aa1')
+    version('3.0.6', sha256='2174106f4f60c9b5b4c479425e172b9b21aa1869d7cdd0f9a8dd0f05ea70e9c2')
+    version('2.15.0', sha256='e2122d2c7d6f81e20f6890c7d291a964ab8d1806bcf125337f2bb7d6c5d47480')
       
     def install(self, spec, prefix):
-        install_tree(join_path(self.stage.source_path,'bin'), join_path(prefix,'bin'))
-        install_tree(join_path(self.stage.source_path,'share'), join_path(prefix,'share'))
+        Tar=Executable('tar')
+        Tar('-x', '-a', '--directory', prefix, '--strip-components=1', '--file', self.stage.archive_file)
+
+    #def setup_environment(self, spack_env, run_env):
+    #    run_env.prepend_path('PATH', join_path(self.prefix.bin))

@@ -59,3 +59,10 @@ class Mshr(CMakePackage):
         os.environ['MPFR_DIR'] = spec['mpfr'].prefix
         
         return(opts)
+
+    @run_after('install')
+    def install_python_interface(self):
+        if '+python' in self.spec:
+            if self.version >= Version('2018.1.0'):
+                cd('python')
+                python('setup.py', 'install', '--prefix={0}'.format(self.prefix))
