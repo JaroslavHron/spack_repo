@@ -91,7 +91,7 @@ class Mvapich2(AutotoolsPackage):
         description='List of the ROMIO file systems to activate',
         values=auto_or_any_combination_of('lustre', 'gpfs', 'nfs', 'ufs'),
     )
-    
+
     depends_on('findutils', type='build')
     depends_on('bison', type='build')
     depends_on('zlib')
@@ -119,7 +119,7 @@ class Mvapich2(AutotoolsPackage):
         return find_libraries(
             libraries, root=self.prefix, shared=True, recursive=True
         )
-    
+
     @property
     def process_manager_options(self):
         spec = self.spec

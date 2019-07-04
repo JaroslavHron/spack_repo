@@ -15,12 +15,13 @@ class Mshr(CMakePackage):
     url      = "https://bitbucket.org/fenics-project/mshr/downloads/mshr-2016.1.0.tar.gz"
     git='https://bitbucket.org/fenics-project/mshr'
 
+    version('2019.1.0', tag='2019.1.0')
     version('2018.1.0', tag='2018.1.0')
     version('2017.2.0', tag='2017.2.0')
     version('2017.1.0', tag='2017.1.0.post0')
 
-    for ver in ['@2018.1.0','@2017.2.0','@2017.1.0'] :
-        depends_on('dolfin{0}'.format(ver), type=("build","run"), when=ver)
+    for ver in ['@2019.1.0', '@2018.1.0', '@2017.2.0', '@2017.1.0'] :
+        depends_on('fenics.dolfin{0}'.format(ver), type=("build","run"), when=ver)
 
     depends_on('boost')
     depends_on('gmp')
@@ -30,6 +31,7 @@ class Mshr(CMakePackage):
     
     # This are the build dependencies
     depends_on('py-setuptools')
+    depends_on('py-pybind11')
     depends_on('cmake')
     depends_on('swig')
 
@@ -60,9 +62,11 @@ class Mshr(CMakePackage):
         
         return(opts)
 
-    @run_after('install')
-    def install_python_interface(self):
-        if '+python' in self.spec:
-            if self.version >= Version('2018.1.0'):
-                cd('python')
-                python('setup.py', 'install', '--prefix={0}'.format(self.prefix))
+    def setup_environment(self, spack_env, run_env):
+        spack_env.set('MSHR_DIR', self.prefix)
+
+    def install(self, spec, prefix):
+        super(Mshr, self).install(spec, prefix)
+        if self.version >= Version('2018.1.0'):
+            cd('python')
+            setup_py('install', '--single-version-externally-managed', '--root=/', '--prefix={0}'.format(prefix))

@@ -13,14 +13,18 @@ class Fenics(Package):
     url      = "https://bitbucket.org/fenics-project/fenics"
     git      = 'https://bitbucket.org/fenics-project/fenics'
 
+    version('2019.1.0', tag='2019.1.0')
     version('2018.1.0', tag='2018.1.0')
     version('2017.2.0', tag='2017.2.0')
 
-    depends_on('dolfin@2018.1.0', when='@2018.1.0')
-    depends_on('mshr@2018.1.0', when='@2018.1.0')
+    depends_on('fenics.dolfin@2019.1.0', when='@2019.1.0')
+    depends_on('fenics.mshr@2019.1.0', when='@2019.1.0')
 
-    depends_on('dolfin@2017.2.0', when='@2017.2.0')
-    depends_on('mshr@2017.2.0', when='@2017.2.0')
+    depends_on('fenics.dolfin@2018.1.0', when='@2018.1.0')
+    depends_on('fenics.mshr@2018.1.0', when='@2018.1.0')
+
+    depends_on('fenics.dolfin@2017.2.0', when='@2017.2.0')
+    depends_on('fenics.mshr@2017.2.0', when='@2017.2.0')
 
     def install(self, spec, prefix):
         install('README.rst', prefix)

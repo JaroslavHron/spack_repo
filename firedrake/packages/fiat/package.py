@@ -17,14 +17,11 @@ For more information, visit http://www.fenicsproject.org
 
     """
 
-    homepage = "https://bitbucket.org/fenics-project/fiat"
-    url      = "https://bitbucket.org/fenics-project/fiat/downloads/fiat-2017.2.0.tar.gz"
-    git='https://bitbucket.org/fenics-project/fiat'
+    homepage = "https://github.com/firedrakeproject/fiat"
+    url      = "https://github.com/firedrakeproject/fiat"
+    git='https://github.com/firedrakeproject/fiat'
     
-    version('2019.1.0', tag='2019.1.0')
-    version('2018.1.0', tag='2018.1.0')
-    version('2017.2.0', tag='2017.2.0')
-    version('2017.1.0', tag='2017.1.0.post1')
+    version('2019.05.29', tag='Firedrake_20190529.1')
 
     depends_on('py-setuptools', type="build")
     depends_on('py-numpy', type=("build","run"))

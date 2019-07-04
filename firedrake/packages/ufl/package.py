@@ -14,14 +14,11 @@ For more information, visit http://www.fenicsproject.org
 
     """
 
-    homepage = "https://bitbucket.org/fenics-project/ufl"
-    url      = "https://bitbucket.org/fenics-project/ufl/downloads/ufl-2017.2.0.tar.gz"
-    git='https://bitbucket.org/fenics-project/ufl'
+    homepage = "https://github.com/firedrakeproject/ufl"
+    url      = "https://github.com/firedrakeproject/ufl"
+    git='https://github.com/firedrakeproject/ufl'
 
-    version('2019.1.0', tag='2019.1.0')
-    version('2018.1.0', tag='2018.1.0')
-    version('2017.2.0', tag='2017.2.0.post0')
-    version('2017.1.0', tag='2017.1.0.post1')
+    version('2019.05.29', tag='Firedrake_20190529.1')
     
     depends_on('py-setuptools', type="build")
     depends_on('py-numpy', type=("build","run"))

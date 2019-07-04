@@ -24,6 +24,7 @@ class Petsc(Package):
     version('develop', branch='master')
     version('xsdk-0.2.0', tag='xsdk-0.2.0')
 
+    version('3.10.5', sha256='3a81c8406410e0ffa8a3e9f8efcdf2e683cc40613c9bb5cb378a6498f595803e')
     version('3.10.3', 'cd106babbae091604fee40c258737c84dec048949be779eaef5a745df3dc8de4')
     version('3.10.2', '63ed950653ae9b8d19daea47e24c0338')
     version('3.10.1', '2d0d5a9bd8112a4147a2a23f7f62a906')
@@ -62,6 +63,8 @@ class Petsc(Package):
             description='Activates support for metis and parmetis')
     variant('hdf5',    default=True,
             description='Activates support for HDF5 (only parallel)')
+    variant('eigen',    default=False,
+            description='Activates support for eigen')
     variant('hypre',   default=True,
             description='Activates support for Hypre (only parallel)')
     # Mumps is disabled by default, because it depends on Scalapack
@@ -118,6 +121,7 @@ class Petsc(Package):
     depends_on('metis@5:~int64', when='@3.8:+metis~int64')
     depends_on('metis@5:+int64', when='@3.8:+metis+int64')
 
+    depends_on('eigen', when='+eigen')
     depends_on('hdf5+mpi+hl+fortran', when='+hdf5+mpi')
     depends_on('zlib', when='+hdf5')
     depends_on('parmetis', when='+metis+mpi')
@@ -283,7 +287,7 @@ class Petsc(Package):
                 'camd,amd,suitesparseconfig'
             options.extend([
                 '--with-suitesparse-include=%s' % spec[ss_spec].prefix.include,
-                '--with-suitesparse-lib=%s' % spec[ss_spec].libs.ld_flags,
+                '--with-suitesparse-lib=%s'     % spec[ss_spec].libs.ld_flags,
                 '--with-suitesparse=1'
             ])
         else:
@@ -293,12 +297,21 @@ class Petsc(Package):
         # SuiteSparse so specify directly the include path and the libraries.
         if 'zlib' in spec:
             options.extend([
-                '--with-zlib-include=%s' % spec['zlib'].prefix.include,
-                '--with-zlib-lib=%s'     % spec['zlib'].libs.ld_flags,
+                #'--with-zlib-include=%s' % spec['zlib'].prefix.include,
+                #'--with-zlib-lib=%s'     % spec['zlib'].libs.ld_flags,
+                '--with-zlib-dir=%s'     % spec['zlib'].prefix,
                 '--with-zlib=1'
             ])
         else:
             options.append('--with-zlib=0')
+
+        if 'eigen' in spec:
+            options.extend([
+                '--download-eigen',
+                '--with-eigen=1'
+            ])
+        else:
+            options.append('--with-eigen=0')
 
         #python('configure', '--prefix=%s' % prefix, *options)
         Executable(sys.executable)('./config/configure.py', '--prefix=%s' % prefix, *options)

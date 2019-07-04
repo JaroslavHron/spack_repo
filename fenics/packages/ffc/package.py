@@ -20,6 +20,7 @@ For more information, visit http://www.fenicsproject.org
     url      = "https://bitbucket.org/fenics-project/ffc/downloads/ffc-2016.1.0.tar.gz"
     git='https://bitbucket.org/fenics-project/ffc'
 
+    version('2019.1.0', tag='2019.1.0.post0')
     version('2018.1.0', tag='2018.1.0.post0')
     version('2017.2.0', tag='2017.2.0.post0')
     version('2017.1.0', tag='2017.1.0.post2')
@@ -30,9 +31,9 @@ For more information, visit http://www.fenicsproject.org
     depends_on('py-numpy', type=("build","run"))
     depends_on('py-six', type=("build","run"))
 
-    for ver in ['2018.1.0','2017.2.0','2017.1.0'] :
+    for ver in ['2019.1.0','2018.1.0','2017.2.0','2017.1.0'] :
         wver='@'+ver
-        depends_on('fiat{0}'.format(wver), type=("build","run"), when=wver)
+        depends_on('fenics.fiat{0}'.format(wver), type=("build","run"), when=wver)
         if( Version(ver) < Version('2018.1.0') ) :
-            depends_on('instant{0}'.format(wver), type=("build","run"), when=wver)
-        depends_on('ufl{0}'.format(wver), type=("build","run"), when=wver)
+            depends_on('fenics.instant{0}'.format(wver), type=("build","run"), when=wver)
+        depends_on('fenics.ufl{0}'.format(wver), type=("build","run"), when=wver)

@@ -14,18 +14,19 @@ class Dolfin(CMakePackage):
     url      = "https://bitbucket.org/fenics-project/dolfin/downloads/dolfin-2016.1.0.tar.gz"
     git      = 'https://bitbucket.org/fenics-project/dolfin'
     
+    version('2019.1.0', tag='2019.1.0.post0')
     version('2018.1.0', tag='2018.1.0.post2')
     version('2017.2.0', tag='2017.2.0.post0')
     version('2017.1.0', tag='2017.1.0.post0')
 
-    for ver in ['2018.1.0','2017.2.0','2017.1.0'] :
+    for ver in ['2019.1.0', '2018.1.0', '2017.2.0', '2017.1.0'] :
         wver='@'+ver
-        depends_on('fiat{0}'.format(wver), type=("build","run"), when=wver)
+        depends_on('fenics.fiat{0}'.format(wver), type=("build","run"), when=wver)
         if( Version(ver) < Version('2018.1.0') ) :
-            depends_on('instant{0}'.format(wver), type=("build","run"), when=wver)
-        depends_on('dijitso{0}'.format(wver), type=("build","run"), when=wver)
-        depends_on('ufl{0}'.format(wver), type=("build","run"), when=wver)
-        depends_on('ffc{0}'.format(wver), type=("build","run"), when=wver)
+            depends_on('fenics.instant{0}'.format(wver), type=("build","run"), when=wver)
+        depends_on('fenics.dijitso{0}'.format(wver), type=("build","run"), when=wver)
+        depends_on('fenics.ufl{0}'.format(wver), type=("build","run"), when=wver)
+        depends_on('fenics.ffc{0}'.format(wver), type=("build","run"), when=wver)
 
     depends_on('boost')
     depends_on('eigen@3.2.0:')
@@ -39,6 +40,7 @@ class Dolfin(CMakePackage):
     depends_on('py-ply')
     depends_on('py-six')
     depends_on('py-pybind11', when='@2018.1.0:')
+    depends_on('py-pkgconfig', when='@2018.1.0:')
     
     depends_on('py-numpy')
     depends_on('py-sympy')
@@ -72,6 +74,9 @@ class Dolfin(CMakePackage):
     depends_on('cmake')
     depends_on('swig')
 
+    variant('bddc', default=False, description='add bddc patch')
+    patch('bddc.patch', when='+bddc')
+    
     variant('petsc',        default=True,  description='Compile with PETSc')
     variant('sundials',     default=True,  description='Compile with sundials')
     variant('hdf5',         default=True,  description='Compile with HDF5')
@@ -94,7 +99,7 @@ class Dolfin(CMakePackage):
     
     def cmake_args(self):
         spec = self.spec
-        
+
         opts = [
             '-DCMAKE_C_COMPILER={0}'.format(spec['mpi'].mpicc), 
             '-DCMAKE_CXX_COMPILER={0}'.format(spec['mpi'].mpicxx) ,
@@ -153,14 +158,16 @@ class Dolfin(CMakePackage):
         os.environ['HDF5_DIR'] = spec['hdf5'].prefix
         os.environ['HDF5_ROOT'] = spec['hdf5'].prefix
                                                                                            
-        return opts
+        return(opts)
                 
     def cmake_is_on(self, option):
         return 'ON' if option in self.spec else 'OFF'
 
-    @run_after('install')
-    def install_python_interface(self):
-        if '+python' in self.spec:
-            if self.version >= Version('2018.1.0'):
-                cd('python')
-                python('setup.py', 'install', '--prefix={0}'.format(self.prefix))
+    def setup_environment(self, spack_env, run_env):
+        spack_env.set('DOLFIN_DIR', self.prefix)
+
+    def install(self, spec, prefix):
+        super(Dolfin, self).install(spec, prefix)
+        if self.version >= Version('2018.1.0'):
+            cd('python')
+            setup_py('install', '--single-version-externally-managed', '--root=/', '--prefix={0}'.format(prefix))
