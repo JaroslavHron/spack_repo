@@ -20,11 +20,10 @@ class Firedrake(PythonPackage):
     depends_on('firedrake.pyop2')
 
     depends_on('boost')
-    depends_on('libspatialindex')
+    depends_on('firedrake.libspatialindex')
     depends_on('libsupermesh')
 
     # This are the build dependencies
-    depends_on('py-setuptools')
     depends_on('cmake')
     depends_on('pkgconfig')
     depends_on('mpi')
@@ -52,23 +51,25 @@ class Firedrake(PythonPackage):
     depends_on('hdf5')
     depends_on('py-h5py')
 
-    @run_before('build')
+    phases = ['build_ext', 'install']
+
+    patch('pf_use_coffee.patch')
+
+    # fix subpackage instalations
+    @run_before('build_ext')
     def fixme(self):
         filter_file(r'"firedrake.matrix_free"','"firedrake.matrix_free", "firedrake.slate", "firedrake.slate.slac", "firedrake.slate.static_condensation", "firedrake.preconditioners"', 'setup.py')
-        
+
+    # create configuration.json
     @run_after('install')
     def post_install(self):
         config='{}/lib/python3.6/site-packages/firedrake_configuration/configuration.json'.format(self.prefix)
         with open(config, 'w') as conf_file:
             conf_file.write('{"options": {"honour_pythonpath": true, "honour_petsc_dir": true}}')
 
-    def build_args(self, spec, prefix):
-        # FIXME: Add arguments other than --prefix
-        # FIXME: If not needed delete this function
-        args = [  ]
+    # add 2 lib dependeces - no idea why they are not found...
+    def build_ext_args(self, spec, prefix):
+        args = [ 
+            '--library-dirs={0}/lib:{1}/lib'.format(spec['libspatialindex'].prefix,spec['libsupermesh'].prefix),
+        ]
         return args
-
-    def install_args(self, spec, prefix):
-        args = ['--prefix={0}'.format(prefix)]
-        return args
-
