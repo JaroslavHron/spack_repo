@@ -17,12 +17,14 @@ class Petsc(Package):
 
     homepage = "http://www.mcs.anl.gov/petsc/index.html"
     url      = "http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.5.3.tar.gz"
-    git      = "https://bitbucket.org/petsc/petsc.git"
+    git      = "https://github.com/firedrakeproject/petsc"
 
     maintainers = ['balay', 'barrysmith', 'jedbrown']
-
+  
     version('develop', branch='master')
     version('xsdk-0.2.0', tag='xsdk-0.2.0')
+
+    version('firedrake-2019.05.29', tag='Firedrake_20190529.1')
 
     version('3.11.3', '199ad9650a9f58603b49e7fff7cd003ceb03aa231e5d37d0bf0496c6348eca81')
     version('3.11.2', '4d244dd7d1565d6534e776445fcf6977a6ee2a8bb2be4a36ac1e0fc1f9ad9cfa')
@@ -115,6 +117,7 @@ class Petsc(Package):
     # Virtual dependencies
     # Git repository needs sowing to build Fortran interface
     depends_on('sowing', when='@develop')
+    depends_on('sowing', when='@firedrake-2019:')
     depends_on('sowing@1.1.23-p1', when='@xsdk-0.2.0')
 
     # PETSc, hypre, superlu_dist when built with int64 use 32 bit integers
@@ -320,6 +323,14 @@ class Petsc(Package):
         else:
             options.append('--with-zlib=0')
 
+        #firedrake-install --show-petsc-configure-options
+        #--download-eigen=/home/hron/firedrake/firedrake/src/eigen-3.3.3.tgz --with-fortran-bindings=0 --download-chaco --download-metis --download-parmetis --download-scalapack --download-hypre --download-mumps --with-zlib --download-netcdf --download-hdf5 --download-pnetcdf --download-exodusii
+        #firedrake_pkgs=['chaco', 'netcdf', 'pnetcdf', 'exodusii']
+        firedrake_pkgs=['chaco', 'hypre', 'eigen']
+        options.append('--with-fortran-bindings=0')
+        for pkg in firedrake_pkgs:
+            options.append('--download-%s' % pkg)
+            
         python('configure', '--prefix=%s' % prefix, *options)
         #Executable(sys.executable)('./config/configure.py', '--prefix=%s' % prefix, *options)
 

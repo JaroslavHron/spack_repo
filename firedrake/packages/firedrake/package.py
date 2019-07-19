@@ -42,10 +42,19 @@ class Firedrake(PythonPackage):
 
     #depends_on('sundials@:3.2.1', when='+sundials')
     
-    depends_on('petsc +eigen')
-    depends_on('slepc')
-    depends_on('py-petsc4py')
-    depends_on('py-slepc4py')
+    #firedrake-install --show-petsc-configure-options
+    #--download-eigen=/home/hron/firedrake/firedrake/src/eigen-3.3.3.tgz --with-fortran-bindings=0 --download-chaco --download-metis --download-parmetis --download-scalapack --download-hypre --download-mumps --with-zlib --download-netcdf --download-hdf5 --download-pnetcdf --download-exodusii
+
+    depends_on('firedrake.petsc@firedrake-2019.05.29 +firedrake ~trilinos ~hypre')
+    depends_on('firedrake.slepc@firedrake-2019.05.29')
+    #depends_on('firedrake.petsc@firedrake +firedrake ~trilinos ~hypre')
+    #depends_on('firedrake.slepc@firedrake')
+    #depends_on('petsc +firedrake ~trilinos ~hypre')
+
+    depends_on('firedrake.py-petsc4py@firedrake-2019.05.29')
+    depends_on('firedrake.py-slepc4py@firedrake-2019.05.29')
+    #depends_on('firedrake.py-petsc4py@firedrake')
+    #depends_on('firedrake.py-slepc4py@firedrake')
 
     depends_on('py-matplotlib')
     depends_on('hdf5')

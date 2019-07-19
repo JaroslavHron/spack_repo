@@ -18,8 +18,11 @@ class Pyop2(PythonPackage):
     depends_on('py-cython')
     depends_on('py-numpy')
     depends_on('py-mpi4py')
-    depends_on('petsc@3.10:')
-    depends_on('py-petsc4py')
+    
+    #depends_on('firedrake.petsc@firedrake-2019.05.29')
+    depends_on('firedrake.petsc')
+    depends_on('firedrake.py-petsc4py')
+
     depends_on('firedrake.coffee')
     depends_on('firedrake.loopy')
 
