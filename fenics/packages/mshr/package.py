@@ -18,9 +18,8 @@ class Mshr(CMakePackage):
     version('2019.1.0', tag='2019.1.0')
     version('2018.1.0', tag='2018.1.0')
     version('2017.2.0', tag='2017.2.0')
-    version('2017.1.0', tag='2017.1.0.post0')
 
-    for ver in ['@2019.1.0', '@2018.1.0', '@2017.2.0', '@2017.1.0'] :
+    for ver in ['@2019.1.0', '@2018.1.0', '@2017.2.0'] :
         depends_on('fenics.dolfin{0}'.format(ver), type=("build","run"), when=ver)
 
     depends_on('boost')

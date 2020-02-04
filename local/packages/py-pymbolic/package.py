@@ -15,6 +15,8 @@ class PyPymbolic(PythonPackage):
     git="https://github.com/inducer/pymbolic"
 
     # FIXME: Add proper versions and checksums here.
+    version('2019.2', tag='v2019.2')
+    version('2019.1', tag='v2019.1')
     version('2017.1', tag='v2017.1')
 
     # FIXME: Add dependencies if required.

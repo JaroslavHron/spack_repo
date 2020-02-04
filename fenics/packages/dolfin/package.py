@@ -17,12 +17,11 @@ class Dolfin(CMakePackage):
     version('2019.1.0', tag='2019.1.0.post0')
     version('2018.1.0', tag='2018.1.0.post2')
     version('2017.2.0', tag='2017.2.0.post0')
-    version('2017.1.0', tag='2017.1.0.post0')
 
-    for ver in ['2019.1.0', '2018.1.0', '2017.2.0', '2017.1.0'] :
+    for ver in ['2019.1.0', '2018.1.0', '2017.2.0'] :
         wver='@'+ver
         depends_on('fenics.fiat{0}'.format(wver), type=("build","run"), when=wver)
-        if( Version(ver) < Version('2018.1.0') ) :
+        if( Version(ver) < Version('2018.1.0') ) : 
             depends_on('fenics.instant{0}'.format(wver), type=("build","run"), when=wver)
         depends_on('fenics.dijitso{0}'.format(wver), type=("build","run"), when=wver)
         depends_on('fenics.ufl{0}'.format(wver), type=("build","run"), when=wver)
@@ -34,9 +33,6 @@ class Dolfin(CMakePackage):
     depends_on('pkgconfig')
     depends_on('mpi', when='+mpi')
 
-    # back ports to python2 - not working in spack
-    #depends_on('py-functools32', type=('build', 'run'), when='@2017.1.0:^python@:2.7')
-    #depends_on('py-subprocess32', type=('build', 'run'), when='@2017.1.0:^python@:2.7')
     depends_on('py-ply')
     depends_on('py-six')
     depends_on('py-pybind11', when='@2018.1.0:')
@@ -50,10 +46,10 @@ class Dolfin(CMakePackage):
 
     depends_on('sundials@:3.2.1', when='+sundials')
     
-    depends_on('petsc', when='+petsc')
-    depends_on('slepc', when='+slepc')
-    depends_on('py-petsc4py', when='+petsc4py')
-    depends_on('py-slepc4py', when='+slepc4py')
+    depends_on('petsc@:3.11.99~trilinos', when='+petsc')
+    depends_on('slepc@:3.11.99', when='+slepc')
+    depends_on('py-petsc4py@:3.11.99', when='+petsc4py')
+    depends_on('py-slepc4py@:3.11.99', when='+slepc4py')
 
     depends_on('py-matplotlib')
     depends_on('py-sphinx', when='+doc')
@@ -82,7 +78,7 @@ class Dolfin(CMakePackage):
     variant('hdf5',         default=True,  description='Compile with HDF5')
     variant('scotch',       default=True,  description='Compile with Scotch')
     variant('slepc',        default=True,  description='Compile with SLEPc')
-    variant('trilinos',     default=True,  description='Compile with Trilinos')
+    variant('trilinos',     default=False,  description='Compile with Trilinos')
     variant('suitesparse',  default=True,  description='Compile with SuiteSparse solvers')
     variant('vtk',          default=False, description='Compile with VTK')
     variant('mpi',          default=True,  description='Enables the distributed memory support')
@@ -95,7 +91,7 @@ class Dolfin(CMakePackage):
 
     variant('pastix',       default=False,  description='Compile with Pastix')
 
-    variant('doc',     default=True,  description='Create docs.')
+    variant('doc',     default=False,  description='Create docs.')
     
     def cmake_args(self):
         spec = self.spec

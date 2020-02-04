@@ -7,7 +7,9 @@ class Coffee(PythonPackage):
     url      = "https://github.com/coneoproject/COFFEE"
     git='https://github.com/coneoproject/COFFEE'
     
-    version('2019.05.29', tag='Firedrake_20190529.1')
+    version('2019.12.31', commit='72a4464aa18fd408de5304ac467db18d7af2b670')
+    version('2019.10.18', commit='72a4464aa18fd408de5304ac467db18d7af2b670')
+    version('master', branch='master')
     
     depends_on('py-setuptools', type="build")
     depends_on('pulp')

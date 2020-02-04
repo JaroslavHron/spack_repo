@@ -12,16 +12,11 @@ class PyPetsc4py(PythonPackage):
 
     homepage = "https://bitbucket.org/petsc/petsc4py"
     url      = "https://bitbucket.org/petsc/petsc4py/get/3.10.0.tar.gz"
-    git      = "https://github.com/firedrakeproject/petsc4py"
+    git      = "https://bitbucket.org/petsc/petsc4py.git"
 
     maintainers = ['dalcinl', 'balay']
 
-    #version('trunk-firedrake.2019.12.31', commit='6db1736a28cbe9c42d87fc87ad3b5a383546a079', get_full_repo=True)
-    #version('trunk-firedrake.2019.10.18', commit='6db1736a28cbe9c42d87fc87ad3b5a383546a079', get_full_repo=True)
-
-    version('master-firedrake', branch='firedrake')
     version('develop', branch='master')
-
     version('3.12.0', sha256='1ddffc35163ec81de50ca43b8a82fdbe73baf02d9e24d594685d5f4a6c17a8cb')
     version('3.11.0', sha256='50a7bbca76000da287d5b18969ddf4743b360bda1f6ee3b43b5829095569cc46')
     version('3.10.1', sha256='4eae5eaf459875b1329cae36fa1e5e185f603e8b01a4e05b59b0983c02b5a174')
@@ -40,9 +35,6 @@ class PyPetsc4py(PythonPackage):
     depends_on('py-mpi4py', type=('build', 'run'))
 
     depends_on('petsc+mpi')
-    depends_on('petsc@master-firedrake+mpi', when='@master-firedrake')
-    #depends_on('petsc@trunk-firedrake.2019.12.31+mpi', when='@trunk-firedrake.2019.12.31')
-    #depends_on('petsc@trunk-firedrake.2019.10.18+mpi', when='@trunk-firedrake.2019.10.18')
     depends_on('petsc@develop+mpi', when='@develop')
     depends_on('petsc@3.12:3.12.99+mpi', when='@3.12:3.12.99')
     depends_on('petsc@3.11:3.11.99+mpi', when='@3.11:3.11.99')

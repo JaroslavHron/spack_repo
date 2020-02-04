@@ -18,7 +18,9 @@ For more information, visit http://www.fenicsproject.org
     url      = "https://github.com/firedrakeproject/ufl"
     git='https://github.com/firedrakeproject/ufl'
 
-    version('2019.05.29', tag='Firedrake_20190529.1')
+    version('2019.12.31', commit='afcc31c0e5fcdb4ddda8560e1be7a8c8b086837d')
+    version('2019.10.18', commit='afcc31c0e5fcdb4ddda8560e1be7a8c8b086837d')
+    version('master', branch='master')
     
     depends_on('py-setuptools', type="build")
     depends_on('py-numpy', type=("build","run"))

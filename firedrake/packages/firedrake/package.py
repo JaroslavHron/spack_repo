@@ -10,15 +10,34 @@ class Firedrake(PythonPackage):
     url      = "https://github.com/firedrakeproject/firedrake"
     git      = 'https://github.com/firedrakeproject/firedrake'
     
-    version('2019.05.29', tag='Firedrake_20190529.1')
-    #version('master', branch='master')
+    version('2019.12.31', commit='3498fdf3e33721adda448755addc11c20bef75a9')
+    version('2019.10.18', commit='54bc0fc8b01fdd67c715a29f22a9e74a099026e4')
+    version('master', branch='master')
 
-    depends_on('firedrake.fiat')
-    depends_on('firedrake.finat')
-    depends_on('firedrake.ufl')
-    depends_on('firedrake.tsfc')
-    depends_on('firedrake.pyop2')
+    for p in ['fiat', 'finat', 'ufl', 'tsfc', 'pyop2'] :
+        for v in [ '2019.12.31', '2019.10.18' ]:
+            depends_on('firedrake.{0}@{1}'.format(p,v), when='@'+v)
+        depends_on('firedrake.{0}@master'.format(p), when='@master')
+    
+    # use petsc with firedrake-install --show-petsc-configure-options
 
+    #for v in [ '2019.12.31', '2019.10.18' ]:
+    #    depends_on('firedrake.petsc@trunk-firedrake.'+v+' +firedrake ~trilinos ~hypre', when='@'+v)
+    #    depends_on('firedrake.slepc@trunk-firedrake.'+v, when='@'+v)
+    #    depends_on('firedrake.py-petsc4py@trunk-firedrake.'+v, when='@'+v)
+    #    depends_on('firedrake.py-slepc4py@trunk-firedrake.'+v, when='@'+v)
+
+    #depends_on('firedrake.petsc@master-firedrake +firedrake ~trilinos ~hypre', when='@master')
+    #depends_on('firedrake.slepc@master-firedrake', when='@master')
+    #depends_on('firedrake.py-petsc4py@master-firedrake', when='@master')
+    #depends_on('firedrake.py-slepc4py@master-firedrake', when='@master')
+
+    depends_on('firedrake.petsc@master-firedrake +firedrake')
+    depends_on('firedrake.slepc@master-firedrake')
+    depends_on('firedrake.py-petsc4py@master-firedrake')
+    depends_on('firedrake.py-slepc4py@master-firedrake')
+
+                                                                        
     depends_on('boost')
     depends_on('firedrake.libspatialindex')
     depends_on('libsupermesh')

@@ -17,6 +17,8 @@ class PyMpi4py(PythonPackage):
     git      = "https://github.com/mpi4py/mpi4py.git"
 
     version('develop', branch='master')
+    version('3.0.3', sha256='012d716c8b9ed1e513fcc4b18e5af16a8791f51e6d1716baccf988ad355c5a1f')
+    version('3.0.2', sha256='f8d629d1e3e3b7b89cb99d0e3bc5505e76cc42089829807950d5c56606ed48e0')
     version('3.0.1', sha256='6549a5b81931303baf6600fa2e3bc04d8bd1d5c82f3c21379d0d64a9abcca851')
     version('3.0.0', 'bfe19f20cef5e92f6e49e50fb627ee70')
     version('2.0.0', '4f7d8126d7367c239fd67615680990e3')
@@ -25,12 +27,12 @@ class PyMpi4py(PythonPackage):
     depends_on('python@2.7:2.8,3.3:')
     depends_on('py-setuptools', type='build')
     depends_on('mpi')
-    depends_on('py-cython', when='@develop', type='build')
+    depends_on('py-cython', type='build')
 
     @run_after('install')
     def post_install(self):
         self.setup_py('build_exe', '--mpi={0}'.format(self.spec['mpi'].prefix))
         self.setup_py('install_exe', '--install-dir={0}'.format(self.prefix))
         mkdirp(self.prefix.bin)
-        symlink('../python3.6-mpi', '{0}/python-mpi'.format(self.prefix.bin))
+        symlink('../python{0}-mpi'.format(self.spec['python'].version.up_to(2)), '{0}/python-mpi'.format(self.prefix.bin))
                 

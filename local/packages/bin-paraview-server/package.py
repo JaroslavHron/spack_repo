@@ -1,6 +1,6 @@
 from spack import *
 
-class BinParaview(Package):
+class BinParaviewServer(Package):
     homepage = 'http://www.paraview.org'
     url      = 'http://www.paraview.org'
 
@@ -12,11 +12,10 @@ class BinParaview(Package):
         elif version < Version(5.6) :
             _url_str = 'http://www.paraview.org/files/v{0}/ParaView-{1}-Qt5-MPI-Linux-64bit.tar.gz'
         else :
-            _url_str = 'http://www.paraview.org/files/v{0}/ParaView-{1}-MPI-Linux-64bit.tar.gz'
+            _url_str = 'http://www.paraview.org/files/v{0}/ParaView-{1}-osmesa-MPI-Linux-64bit.tar.gz'                
         return _url_str.format(version.up_to(2),version)
 
-    version('5.6.2', sha256='19374dc3fcbc694ef07ef7c44f960fd401141bf01445a13c66af6ac77d5374d3', expand=False)
-    version('5.6.1', sha256='5dbf6e2d4f524556ae6f7823ec6581cd163434da36a0caef57a6620f7cd43f9c', expand=False)
+    version('5.6.1', sha256='f24b527fb8be7e16c8f5efbc30537b03088eadf3954be4051b51b8a4ccee4a23', expand=False)
 
     def install(self, spec, prefix):
         Tar=Executable('tar')

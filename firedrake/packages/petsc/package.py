@@ -20,43 +20,13 @@ class Petsc(Package):
     git      = "https://github.com/firedrakeproject/petsc"
 
     maintainers = ['balay', 'barrysmith', 'jedbrown']
-  
+
     version('develop', branch='master')
     version('xsdk-0.2.0', tag='xsdk-0.2.0')
+    version('master-firedrake', branch='firedrake')
 
-    version('firedrake-2019.05.29', tag='Firedrake_20190529.1')
-
-    version('3.11.3', '199ad9650a9f58603b49e7fff7cd003ceb03aa231e5d37d0bf0496c6348eca81')
-    version('3.11.2', '4d244dd7d1565d6534e776445fcf6977a6ee2a8bb2be4a36ac1e0fc1f9ad9cfa')
-    version('3.11.1', 'cb627f99f7ce1540ebbbf338189f89a5f1ecf3ab3b5b0e357f9e46c209f1fb23')
-    version('3.11.0', 'b3bed2a9263193c84138052a1b92d47299c3490dd24d1d0bf79fb884e71e678a')
-    version('3.10.5', '3a81c8406410e0ffa8a3e9f8efcdf2e683cc40613c9bb5cb378a6498f595803e')
-    version('3.10.4', '6c836df84caa9ae683ae401d3f94eb9471353156fec6db602bf2e857e4ec339f')
-    version('3.10.3', 'cd106babbae091604fee40c258737c84dec048949be779eaef5a745df3dc8de4')
-    version('3.10.2', '63ed950653ae9b8d19daea47e24c0338')
-    version('3.10.1', '2d0d5a9bd8112a4147a2a23f7f62a906')
-    version('3.10.0', '0240c2ce8c54e47b3531a743ee844d41')
-    version('3.9.4', 'c98eb67573efb2f91c6f239368259e44')
-    version('3.9.3', '7b71d705f66f9961cb0e2da3f9da79a1')
-    version('3.9.2', '8bedc0cd8c8603d54bfd99a6e8f77b3d')
-    version('3.9.1', 'd3a229a188dbeef9b3f29b9a63622fad')
-    version('3.9.0', '34b8a81814ca050a96d58e53a2f0ac7a')
-    version('3.8.4', 'd7767fe2919536aa393eb22841899306')
-    version('3.8.3', '322cbcf2a0f7b7bad562643b05d66f11')
-    version('3.8.2', '00666e1c4cbfa8dd6eebf91ff8180f79')
-    version('3.8.1', '3ed75c1147800fc156fe1f1e515a68a7')
-    version('3.8.0', '02680f1f78a0d4c5a9de80a366793eb8')
-    version('3.7.7', 'c2cfb76677d32839810c4cf51a2f9cf5')
-    version('3.7.6', '977aa84b85aa3146c695592cd0a11057')
-    version('3.7.5', 'f00f6e6a3bac39052350dd47194b58a3')
-    version('3.7.4', 'aaf94fa54ef83022c14091f10866eedf')
-    version('3.7.2', '50da49867ce7a49e7a0c1b37f4ec7b34')
-    version('3.6.4', '7632da2375a3df35b8891c9526dbdde7')
-    version('3.6.3', '91dd3522de5a5ef039ff8f50800db606')
-    version('3.5.3', 'd4fd2734661e89f18ac6014b5dd1ef2f')
-    version('3.5.2', 'ad170802b3b058b5deb9cd1f968e7e13')
-    version('3.5.1', 'a557e029711ebf425544e117ffa44d8f')
-    version('3.4.4', '7edbc68aa6d8d6a3295dd5f6c2f6979d')
+    #version('trunk-firedrake.2019.12.31', commit='49720042e5cd5f24a0fea16ff2f129ba53b17b9e', get_full_repo=True)
+    #version('trunk-firedrake.2019.10.18', commit='edd0a2d9fa6ef4d7e0b754c00c43eb7e21ac31c6', get_full_repo=True)
 
     variant('shared',  default=True,
             description='Enables the build of shared libraries')
@@ -66,21 +36,6 @@ class Petsc(Package):
     variant('complex', default=False, description='Build with complex numbers')
     variant('debug',   default=False, description='Compile in debug mode')
 
-    variant('metis',   default=True,
-            description='Activates support for metis and parmetis')
-    variant('hdf5',    default=True,
-            description='Activates support for HDF5 (only parallel)')
-    variant('hypre',   default=True,
-            description='Activates support for Hypre (only parallel)')
-    # Mumps is disabled by default, because it depends on Scalapack
-    # which is not portable to all HPC systems
-    variant('mumps',   default=False,
-            description='Activates support for MUMPS (only parallel'
-            ' and 32bit indices)')
-    variant('superlu-dist', default=True,
-            description='Activates support for SuperluDist (only parallel)')
-    variant('trilinos', default=False,
-            description='Activates support for Trilinos (only parallel)')
     variant('int64', default=False,
             description='Compile with 64bit indices')
     variant('clanguage', default='C', values=('C', 'C++'),
@@ -90,14 +45,15 @@ class Petsc(Package):
             description='Activates support for FFTW (only parallel)')
     variant('suite-sparse', default=False,
             description='Activates support for SuiteSparse')
-
     variant(
-            'firedrake', default=False,
+            'firedrake', default=True,
             description='Additional external packages downloaded by petsc during build required by firedrake')
 
     
     variant('X', default=False,
             description='Activate X support')
+    variant('batch', default=False,
+            description='Enable when mpiexec is not available to run binaries')
 
     # 3.8.0 has a build issue with MKL - so list this conflict explicitly
     conflicts('^intel-mkl', when='@3.8.0')
@@ -114,10 +70,15 @@ class Petsc(Package):
               when='@3.7.5%clang@8.1.0:')
     patch('pkg-config-3.7.6-3.8.4.diff', when='@3.7.6:3.8.4')
 
+    patch('xcode_stub_out_of_sync.patch', when='@:3.10.4')
+
+    patch('xlf_fix-dup-petscfecreate.patch', when='@3.11.0')
+
     # Virtual dependencies
     # Git repository needs sowing to build Fortran interface
     depends_on('sowing', when='@develop')
-    depends_on('sowing', when='@firedrake-2019:')
+    depends_on('sowing', when='@firedrake.2019:')
+    depends_on('sowing', when='@master-firedrake')
     depends_on('sowing@1.1.23-p1', when='@xsdk-0.2.0')
 
     # PETSc, hypre, superlu_dist when built with int64 use 32 bit integers
@@ -127,53 +88,9 @@ class Petsc(Package):
     depends_on('mpi', when='+mpi')
 
     # Build dependencies
-    depends_on('python')
-    #depends_on('python@2.6:2.8', type='build', when='@:3.10.99')
-    #depends_on('python@2.6:2.8,3.4:', type='build', when='@3.11:')
+    depends_on('python@2.6:2.8', type='build', when='@:3.10.99')
+    depends_on('python@2.6:2.8,3.4:', type='build', when='@3.11:')
 
-    # Other dependencies
-    depends_on('metis@5:~int64+real64', when='@:3.7.99+metis~int64+double')
-    depends_on('metis@5:~int64', when='@:3.7.99+metis~int64~double')
-    depends_on('metis@5:+int64+real64', when='@:3.7.99+metis+int64+double')
-    depends_on('metis@5:+int64', when='@:3.7.99+metis+int64~double')
-    # petsc-3.8+ uses default (float) metis with any (petsc) precision
-    depends_on('metis@5:~int64', when='@3.8:+metis~int64')
-    depends_on('metis@5:+int64', when='@3.8:+metis+int64')
-
-    depends_on('hdf5+mpi+hl+fortran', when='+hdf5+mpi')
-    depends_on('zlib', when='+hdf5')
-    depends_on('parmetis', when='+metis+mpi')
-    # Hypre does not support complex numbers.
-    # Also PETSc prefer to build it without internal superlu, likely due to
-    # conflict in headers see
-    # https://bitbucket.org/petsc/petsc/src/90564b43f6b05485163c147b464b5d6d28cde3ef/config/BuildSystem/config/packages/hypre.py
-    depends_on('hypre@:2.13.99~internal-superlu~int64', when='@:3.8.99+hypre+mpi~complex~int64')
-    depends_on('hypre@:2.13.99~internal-superlu+int64', when='@:3.8.99+hypre+mpi~complex+int64')
-    depends_on('hypre@2.14:~internal-superlu~int64', when='@3.9:+hypre+mpi~complex~int64')
-    depends_on('hypre@2.14:~internal-superlu+int64', when='@3.9:+hypre+mpi~complex+int64')
-    depends_on('hypre@xsdk-0.2.0~internal-superlu+int64', when='@xsdk-0.2.0+hypre+mpi~complex+int64')
-    depends_on('hypre@xsdk-0.2.0~internal-superlu~int64', when='@xsdk-0.2.0+hypre+mpi~complex~int64')
-    depends_on('hypre@develop~internal-superlu+int64', when='@develop+hypre+mpi~complex+int64')
-    depends_on('hypre@develop~internal-superlu~int64', when='@develop+hypre+mpi~complex~int64')
-    depends_on('superlu-dist@:4.3~int64', when='@3.4.4:3.6.4+superlu-dist+mpi~int64')
-    depends_on('superlu-dist@:4.3+int64', when='@3.4.4:3.6.4+superlu-dist+mpi+int64')
-    depends_on('superlu-dist@5.0.0:~int64', when='@3.7:3.7.99+superlu-dist+mpi~int64')
-    depends_on('superlu-dist@5.0.0:+int64', when='@3.7:3.7.99+superlu-dist+mpi+int64')
-    depends_on('superlu-dist@5.2:5.2.99~int64', when='@3.8:3.9.99+superlu-dist+mpi~int64')
-    depends_on('superlu-dist@5.2:5.2.99+int64', when='@3.8:3.9.99+superlu-dist+mpi+int64')
-    depends_on('superlu-dist@5.4:5.4.99~int64', when='@3.10:3.10.2+superlu-dist+mpi~int64')
-    depends_on('superlu-dist@5.4:5.4.99+int64', when='@3.10:3.10.2+superlu-dist+mpi+int64')
-    depends_on('superlu-dist@6.1:6.1.99~int64', when='@3.10.3:3.11.99+superlu-dist+mpi~int64')
-    depends_on('superlu-dist@6.1:6.1.99+int64', when='@3.10.3:3.11.99+superlu-dist+mpi+int64')
-    depends_on('superlu-dist@xsdk-0.2.0~int64', when='@xsdk-0.2.0+superlu-dist+mpi~int64')
-    depends_on('superlu-dist@xsdk-0.2.0+int64', when='@xsdk-0.2.0+superlu-dist+mpi+int64')
-    depends_on('superlu-dist@develop~int64', when='@develop+superlu-dist+mpi~int64')
-    depends_on('superlu-dist@develop+int64', when='@develop+superlu-dist+mpi+int64')
-    depends_on('mumps+mpi', when='+mumps+mpi~int64')
-    depends_on('scalapack', when='+mumps+mpi~int64')
-    depends_on('trilinos@12.6.2:', when='@3.7.0:+trilinos+mpi')
-    depends_on('trilinos@xsdk-0.2.0', when='@xsdk-0.2.0+trilinos+mpi')
-    depends_on('trilinos@develop', when='@xdevelop+trilinos+mpi')
     depends_on('fftw+mpi', when='+fftw+mpi')
     depends_on('suite-sparse', when='+suite-sparse')
     depends_on('libx11', when='+X')
@@ -204,7 +121,7 @@ class Petsc(Package):
             compiler_opts = [
                 '--with-cc=%s' % self.spec['mpi'].mpicc,
                 '--with-cxx=%s' % self.spec['mpi'].mpicxx,
-                '--with-fc=%s' % self.spec['mpi'].mpifc
+                '--with-fc=%s' % self.spec['mpi'].mpifc,
             ]
             if self.spec.satisfies('%intel'):
                 # mpiifort needs some help to automatically link
@@ -247,70 +164,7 @@ class Petsc(Package):
         else:
             options.append('--with-x=0')
 
-        if 'trilinos' in spec:
-            options.append('--with-cxx-dialect=C++11')
-            if spec.satisfies('^trilinos+boost'):
-                options.append('--with-boost=1')
-
-        if self.spec.satisfies('clanguage=C++'):
-            options.append('--with-clanguage=C++')
-        else:
-            options.append('--with-clanguage=C')
-
-        # PETSc depends on scalapack when '+mumps+mpi~int64' (see depends())
-        # help PETSc pick up Scalapack from MKL
-        if spec.satisfies('+mumps+mpi~int64'):
-            scalapack = spec['scalapack'].libs
-            options.extend([
-                '--with-scalapack-lib=%s' % scalapack.joined(),
-                '--with-scalapack=1'
-            ])
-        else:
-            options.extend([
-                '--with-scalapack=0'
-            ])
-
-        # Activates library support if needed
-        for library in ('metis', 'hdf5', 'hypre', 'parmetis',
-                        'mumps', 'trilinos', 'fftw'):
-            options.append(
-                '--with-{library}={value}'.format(
-                    library=library, value=('1' if library in spec else '0'))
-            )
-            if library in spec:
-                options.append(
-                    '--with-{library}-dir={path}'.format(
-                        library=library, path=spec[library].prefix)
-                )
-        # PETSc does not pick up SuperluDist from the dir as they look for
-        # superlu_dist_4.1.a
-        if 'superlu-dist' in spec:
-            if spec.satisfies('@3.10.3:'):
-                options.append('--with-cxx-dialect=C++11')
-            options.extend([
-                '--with-superlu_dist-include=%s' %
-                spec['superlu-dist'].prefix.include,
-                '--with-superlu_dist-lib=%s' %
-                join_path(spec['superlu-dist'].prefix.lib,
-                          'libsuperlu_dist.a'),
-                '--with-superlu_dist=1'
-            ])
-        else:
-            options.append(
-                '--with-superlu_dist=0'
-            )
-        # SuiteSparse: configuring using '--with-suitesparse-dir=...' has some
-        # issues, so specify directly the include path and the libraries.
-        if '+suite-sparse' in spec:
-            ss_spec = 'suite-sparse:umfpack,klu,cholmod,btf,ccolamd,colamd,' \
-                'camd,amd,suitesparseconfig'
-            options.extend([
-                '--with-suitesparse-include=%s' % spec[ss_spec].prefix.include,
-                '--with-suitesparse-lib=%s'     % spec[ss_spec].libs.joined(),
-                '--with-suitesparse=1'
-            ])
-        else:
-            options.append('--with-suitesparse=0')
+        options.append('--with-cxx-dialect=C++11')
 
         # zlib: configuring using '--with-zlib-dir=...' has some issues with
         # SuiteSparse so specify directly the include path and the libraries.
@@ -324,15 +178,15 @@ class Petsc(Package):
             options.append('--with-zlib=0')
 
         #firedrake-install --show-petsc-configure-options
-        #--download-eigen=/home/hron/firedrake/firedrake/src/eigen-3.3.3.tgz --with-fortran-bindings=0 --download-chaco --download-metis --download-parmetis --download-scalapack --download-hypre --download-mumps --with-zlib --download-netcdf --download-hdf5 --download-pnetcdf --download-exodusii
-        #firedrake_pkgs=['chaco', 'netcdf', 'pnetcdf', 'exodusii']
-        firedrake_pkgs=['chaco', 'hypre', 'eigen']
-        options.append('--with-fortran-bindings=0')
+        #--download-chaco --download-hdf5 --with-cxx-dialect=C++11 --download-hypre --download-mumps --download-netcdf --download-ml --download-mpich --download-ptscotch --with-shared-libraries=1 --download-metis --download-exodusii --download-pragmatic --download-pnetcdf --download-suitesparse --download-pastix --with-c2html=0 --with-fortran-bindings=0 --download-superlu_dist --with-debugging=0 --download-eigen=/home/hron/pkg/DEV/firedrake/firedrake/src/eigen-3.3.3.tgz --with-zlib --download-scalapack                              
+        firedrake_pkgs=['chaco', 'hdf5', 'hypre', 'mumps', 'netcdf', 'ml', 'ptscotch', 'metis', 'exodusii', 'pragmatic', 'pnetcdf', 'suitesparse', 'pastix', 'superlu_dist', 'scalapack', 'triangle', 'ctetgen']
         for pkg in firedrake_pkgs:
             options.append('--download-%s' % pkg)
             
+        options.append('--download-eigen={}'.format('https://github.com/eigenteam/eigen-git-mirror/archive/3.3.3.tar.gz'))
+        options.append('--with-fortran-bindings=0')
+
         python('configure', '--prefix=%s' % prefix, *options)
-        #Executable(sys.executable)('./config/configure.py', '--prefix=%s' % prefix, *options)
 
         # PETSc has its own way of doing parallel make.
         make('MAKE_NP=%s' % make_jobs, parallel=False)
@@ -380,22 +234,20 @@ class Petsc(Package):
                         '-pc_type', 'hypre',
                         '-pc_hypre_type', 'boomeramg')
 
-    def setup_environment(self, spack_env, run_env):
+    def setup_build_environment(self, env):
         # configure fails if these env vars are set outside of Spack
-        spack_env.unset('PETSC_DIR')
-        spack_env.unset('PETSC_ARCH')
+        env.unset('PETSC_DIR')
+        env.unset('PETSC_ARCH')
 
-        #spack_env.unset('PYTHONPATH')
-        #spack_env.unset('PYTHONHOME')
-                
+    def setup_run_environment(self, env):
         # Set PETSC_DIR in the module file
-        run_env.set('PETSC_DIR', self.prefix)
-        run_env.unset('PETSC_ARCH')
+        env.set('PETSC_DIR', self.prefix)
+        env.unset('PETSC_ARCH')
 
-    def setup_dependent_environment(self, spack_env, run_env, dependent_spec):
+    def setup_dependent_build_environment(self, env, dependent_spec):
         # Set up PETSC_DIR for everyone using PETSc package
-        spack_env.set('PETSC_DIR', self.prefix)
-        spack_env.unset('PETSC_ARCH')
+        env.set('PETSC_DIR', self.prefix)
+        env.unset('PETSC_ARCH')
 
     @property
     def headers(self):

@@ -21,7 +21,9 @@ For more information, visit http://www.fenicsproject.org
     url      = "https://github.com/firedrakeproject/fiat"
     git='https://github.com/firedrakeproject/fiat'
     
-    version('2019.05.29', tag='Firedrake_20190529.1')
+    version('2019.12.31', commit='ae587ff3a32be0b23edae3222e88b0f62da9f3e4')
+    version('2019.10.18', commit='ae587ff3a32be0b23edae3222e88b0f62da9f3e4')
+    version('master', branch='master')
 
     depends_on('py-setuptools', type="build")
     depends_on('py-numpy', type=("build","run"))

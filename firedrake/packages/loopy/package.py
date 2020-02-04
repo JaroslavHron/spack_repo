@@ -14,8 +14,9 @@ class Loopy(PythonPackage):
     url      = "https://github.com/firedrakeproject/loopy"
     git = "https://github.com/firedrakeproject/loopy"
 
-    version('master', branch='master' , submodules=True )
-    version('2019.05.29', tag='Firedrake_20190529.1', submodules=True)
+    version('firedrake', branch='firedrake' , submodules=True )
+    version('2019.12.31', commit='c91cb1b1398f5bbe9fa82b4712eb58e4d1e6c33c', submodules=True)
+    version('2019.10.18', commit='b9c84fe46e8cc0ac2761c947fa1a607a752add49', submodules=True)
      
     depends_on('py-setuptools', type='build')
     depends_on('py-pytools')

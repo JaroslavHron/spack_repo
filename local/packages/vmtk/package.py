@@ -25,3 +25,8 @@ class Vmtk(CMakePackage):
     
     def install(self, spec, prefix):
         install_tree('spack-build/Install', prefix)
+
+    def setup_environment(self, spack_env, run_env):
+        # Set DIR in the module file
+        run_env.set('VMTKHOME', self.prefix)
+                                                                        

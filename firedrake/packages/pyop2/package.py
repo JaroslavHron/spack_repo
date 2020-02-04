@@ -7,7 +7,9 @@ class Pyop2(PythonPackage):
     url      = "https://github.com/OP2/PyOP2"
     git='https://github.com/OP2/PyOP2'
     
-    version('2019.05.29', tag='Firedrake_20190529.1')
+    version('2019.12.31', commit='8e1c5720fe0a8f7b4e870a49c43608d97c66ad14')
+    version('2019.10.18', commit='070367eb5ffa3bacb5676b843eb77041c62a3066')
+    version('master', branch='master')
 
     phases = ['build_ext', 'install']
     
@@ -19,13 +21,23 @@ class Pyop2(PythonPackage):
     depends_on('py-numpy')
     depends_on('py-mpi4py')
     
-    #depends_on('firedrake.petsc@firedrake-2019.05.29')
-    depends_on('firedrake.petsc')
-    depends_on('firedrake.py-petsc4py')
+    #for v in [ '2019.12.31' , '2019.10.18' ] :
+    #    depends_on('firedrake.petsc@trunk-firedrake.'+v, when='@'+v)
+    #    depends_on('firedrake.py-petsc4py@trunk-firedrake.'+v, when='@'+v)
+
+    #depends_on('firedrake.petsc@master-firedrake', when='@master')
+    #depends_on('firedrake.py-petsc4py@master-firedrake', when='@master')
+
+    depends_on('firedrake.petsc@master-firedrake')
+    depends_on('firedrake.py-petsc4py@master-firedrake')
 
     depends_on('firedrake.coffee')
-    depends_on('firedrake.loopy')
+    depends_on('firedrake.coffee@master', when='@master')
 
+    depends_on('firedrake.loopy')
+    depends_on('firedrake.loopy@firedrake', when='@master')
+
+    
     @run_before('build_ext')
     def fixme(self):
         filter_file(r'packages=\[\'pyop2\'\]', 'packages=[\'pyop2\',\'pyop2.codegen\']', 'setup.py')

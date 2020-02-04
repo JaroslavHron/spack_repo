@@ -14,7 +14,11 @@ class PySlepc4py(PythonPackage):
     url      = "https://bitbucket.org/slepc/slepc4py/get/3.10.0.tar.gz"
     git      = "https://github.com/firedrakeproject/slepc4py"
 
-    version('firedrake-2019.05.29', tag='Firedrake_20190529.1')
+    #version('trunk-firedrake.2019.12.31', commit='1316f10aa6ffb9045f0a189da204bd54982403af', get_full_repo=True)
+    #version('trunk-firedrake.2019.10.18', commit='1316f10aa6ffb9045f0a189da204bd54982403af', get_full_repo=True)
+
+    version('master-firedrake', branch='firedrake')
+    version('develop', branch='master')
 
     version('3.11.0', sha256='adcb19d58471f835022dfaee3eb7ae2ff96d0bac78533e08707560fe2e18c72f')
     version('3.10.0', sha256='6494959f44280d3b80e73978d7a6bf656c9bb04bb3aa395c668c7a58948db1c6')
@@ -25,7 +29,9 @@ class PySlepc4py(PythonPackage):
     depends_on('py-setuptools', type='build')
 
     depends_on('py-petsc4py', type=('build', 'run'))
-    depends_on('py-petsc4py@firedrake-2019.05.29', when='@firedrake-2019.05.29', type=('build', 'run'))
+    #depends_on('py-petsc4py@trunk-firedrake.2019.12.31', when='@trunk-firedrake.2019.12.31', type=('build', 'run'))
+    #depends_on('py-petsc4py@trunk-firedrake.2019.10.18', when='@trunk-firedrake.2019.10.18', type=('build', 'run'))
+    depends_on('py-petsc4py@master-firedrake', when='@master-firedrake', type=('build', 'run'))
     depends_on('py-petsc4py@3.11:3.11.99', when='@3.11:3.11.99', type=('build', 'run'))
     depends_on('py-petsc4py@3.10:3.10.99', when='@3.10:3.10.99', type=('build', 'run'))
     depends_on('py-petsc4py@3.9:3.9.99', when='@3.9:3.9.99', type=('build', 'run'))
@@ -34,7 +40,9 @@ class PySlepc4py(PythonPackage):
     depends_on('py-petsc4py@3.6:3.6.99', when='@3.6:3.6.99', type=('build', 'run'))
 
     depends_on('slepc')
-    depends_on('slepc@firedrake-2019.05.29', when='@firedrake-2019.05.29')
+    #depends_on('slepc@trunk-firedrake.2019.12.31', when='@trunk-firedrake.2019.12.31')
+    #depends_on('slepc@trunk-firedrake.2019.10.18', when='@trunk-firedrake.2019.10.18')
+    depends_on('slepc@master-firedrake', when='@master-firedrake')
     depends_on('slepc@3.11:3.11.99', when='@3.11:3.11.99')
     depends_on('slepc@3.10:3.10.99', when='@3.10:3.10.99')
     depends_on('slepc@3.9:3.9.99', when='@3.9:3.9.99')
